@@ -7,6 +7,7 @@ const port = 1567
 const app = express()
 
 // Middleware
+app.use('/api', express.json())  // gör så att vi kan använda req.body
 
 // Routes
 app.use('/api/flowers', flowerRouter)
