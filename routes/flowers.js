@@ -9,8 +9,8 @@ const db = getDb()
 // x GET /resource
 // x GET /resource/:id
 // x POST /resource
-//   PUT /resource/:id
-//   DELETE /resource/:id
+// x PUT /resource/:id
+// x DELETE /resource/:id
 
 
 // Alla URL börjar med "/api/flowers"
