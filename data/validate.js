@@ -38,5 +38,13 @@ function generateRandomId() {
 	return Math.round(Math.random() * 1000000000)
 }
 
+function isValidId(x) {
+	// Giltigt id får inte vara NaN och ska vara >= 0
+	let maybeId = Number(x)
+	if( isNaN(maybeId) ) {
+		return false
+	}
+	return maybeId >= 0
+}
 
-export { isValidFlower, hasId, generateRandomId }
+export { isValidFlower, hasId, generateRandomId, isValidId }

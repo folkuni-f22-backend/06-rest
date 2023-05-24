@@ -1,6 +1,6 @@
 import express from 'express'
 import { getDb } from '../data/database.js'
-import { isValidFlower, hasId, generateRandomId } from '../data/validate.js'
+import { isValidFlower, hasId, generateRandomId, isValidId } from '../data/validate.js'
 
 const router = express.Router()
 const db = getDb()
@@ -23,15 +23,14 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	// Kontrollera att id är giltigt
-	let maybeId = Number(req.params.id)
-	// Giltigt id får inte vara NaN och ska vara >= 0
-	if (isNaN(maybeId) || maybeId < 0 ) {
+	if( !isValidId(req.params.id) ) {
 		res.sendStatus(400)
 		return
 	}
+	let id = Number(req.params.id)
 
 	await db.read()
-	let maybeFlower = db.data.flowers.find(flower => flower.id === maybeId)
+	let maybeFlower = db.data.flowers.find(flower => flower.id === id)
 	if( !maybeFlower ) {
 		res.sendStatus(404)
 		return
@@ -64,27 +63,54 @@ router.post('/', async(req, res) => {
 })
 
 
-// TODO
 //   PUT /resource/:id
+router.put('/:id', async (req, res) => {
+	// Validera id
+	if( !isValidId(req.params.id) ) {
+		res.sendStatus(400)
+		return
+	}
+	let id = Number(req.params.id)
+
+	// Validera body (flower object)
+	if( !isValidFlower(req.body) || !hasId(req.body) ) {
+		res.sendStatus(400)
+		return
+	}
+	let newFlower = req.body
+	
+	// Finns blomman med samma id?
+	// I så fall byt ut blom-objektet
+	await db.read()
+	let oldFlowerIndex = db.data.flowers.findIndex(flower => flower.id === id)
+	if( oldFlowerIndex === -1 ) {
+		res.sendStatus(404)
+		return
+	}
+
+	db.data.flowers[oldFlowerIndex] = newFlower
+	await db.write()
+	res.sendStatus(200)
+})
+
 
 //   DELETE /resource/:id
 router.delete('/:id', async (req, res) => {
 	// Kontrollera att id är giltigt
-	let maybeId = Number(req.params.id)
-	// Giltigt id får inte vara NaN och ska vara >= 0
-	if (isNaN(maybeId) || maybeId < 0) {
+	if (!isValidId(req.params.id)) {
 		res.sendStatus(400)
 		return
 	}
+	let id = Number(req.params.id)
 
 	await db.read()
-	let maybeFlower = db.data.flowers.find(flower => flower.id === maybeId)
+	let maybeFlower = db.data.flowers.find(flower => flower.id === id)
 	if (!maybeFlower) {
 		res.sendStatus(404)
 		return
 	}
 
-	db.data.flowers = db.data.flowers.filter(flower => flower.id !== maybeId)
+	db.data.flowers = db.data.flowers.filter(flower => flower.id !== id)
 	await db.write()
 	res.sendStatus(200)
 })
