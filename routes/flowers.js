@@ -7,7 +7,7 @@ const db = getDb()
 
 // Dessa endpoints behöver byggas för att vi ska ha ett RESTful API
 // x GET /resource
-//   GET /resource/:id
+// x GET /resource/:id
 // x POST /resource
 //   PUT /resource/:id
 //   DELETE /resource/:id
@@ -20,7 +20,27 @@ router.get('/', async (req, res) => {
 	// res.status(200).send(plants)
 })	
 
-// TODO: ni får jobba med GET /resource/:id
+
+router.get('/:id', async (req, res) => {
+	// Kontrollera att id är giltigt
+	let maybeId = Number(req.params.id)
+	// Giltigt id får inte vara NaN och ska vara >= 0
+	if (isNaN(maybeId) || maybeId < 0 ) {
+		res.sendStatus(400)
+		return
+	}
+
+	await db.read()
+	let maybeFlower = db.data.flowers.find(flower => flower.id === maybeId)
+	if( !maybeFlower ) {
+		res.sendStatus(404)
+		return
+	}
+
+	res.send(maybeFlower)
+})
+
+
 
 router.post('/', async(req, res) => {
 	let maybeFlower = req.body
@@ -43,6 +63,10 @@ router.post('/', async(req, res) => {
 	}
 })
 
+
+// TODO
+//   PUT /resource/:id
+//   DELETE /resource/:id
 
 
 
