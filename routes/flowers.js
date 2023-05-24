@@ -66,7 +66,28 @@ router.post('/', async(req, res) => {
 
 // TODO
 //   PUT /resource/:id
+
 //   DELETE /resource/:id
+router.delete('/:id', async (req, res) => {
+	// Kontrollera att id är giltigt
+	let maybeId = Number(req.params.id)
+	// Giltigt id får inte vara NaN och ska vara >= 0
+	if (isNaN(maybeId) || maybeId < 0) {
+		res.sendStatus(400)
+		return
+	}
+
+	await db.read()
+	let maybeFlower = db.data.flowers.find(flower => flower.id === maybeId)
+	if (!maybeFlower) {
+		res.sendStatus(404)
+		return
+	}
+
+	db.data.flowers = db.data.flowers.filter(flower => flower.id !== maybeId)
+	await db.write()
+	res.sendStatus(200)
+})
 
 
 
