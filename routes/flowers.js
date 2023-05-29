@@ -54,7 +54,7 @@ router.post('/', async(req, res) => {
 		maybeFlower.id = generateRandomId()
 		db.data.flowers.push(maybeFlower)
 		await db.write()
-		res.status({ id: maybeFlower.id })
+		res.status(200).send({ id: maybeFlower.id })
 
 	} else {
 		// console.log('Felsöker POST: invalid')
